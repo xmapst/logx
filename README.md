@@ -14,7 +14,8 @@ import (
 func main()  {
     // 直接使用, 内容将直接输出到控制台
     logx.Infoln("日志内容")
-    
+
+
     // 设置写入文件
     logx.SetupLogger("logx.log")
     logx.Infof("日志内容")
