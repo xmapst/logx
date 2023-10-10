@@ -12,7 +12,7 @@ import (
 
 var (
 	// levelController 日志输出基本控制器
-	levelController zap.AtomicLevel
+	levelController = zap.NewAtomicLevelAt(zap.DebugLevel)
 )
 
 // initDefaultLogger 在没有外部调用Setup进行日志库设置的情况下，进行默认的日志库配置；
@@ -28,8 +28,6 @@ func CloseLogger() {
 
 // SetupLogger 配置日志记录器
 func SetupLogger(logfile string) {
-	levelController = zap.NewAtomicLevelAt(zap.DebugLevel)
-
 	// 将日志输出到屏幕
 	config := zap.NewProductionEncoderConfig()
 	config.TimeKey = "time"
