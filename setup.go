@@ -3,6 +3,7 @@ package logx
 import (
 	"io"
 	"os"
+	"strings"
 
 	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
@@ -28,13 +29,27 @@ func CloseLogger() {
 
 // SetupLogger 配置日志记录器
 func SetupLogger(logfile string) {
-	// 将日志输出到屏幕
-	config := zap.NewProductionEncoderConfig()
-	config.TimeKey = "time"
-	config.EncodeTime = zapcore.ISO8601TimeEncoder
-	config.EncodeLevel = zapcore.LowercaseLevelEncoder
+	levelController = zap.NewAtomicLevelAt(zap.DebugLevel)
+	config := zapcore.EncoderConfig{
+		CallerKey:     "line",
+		LevelKey:      "level",
+		MessageKey:    "message",
+		TimeKey:       "time",
+		StacktraceKey: "stacktrace",
+		LineEnding:    zapcore.DefaultLineEnding,
+		EncodeTime:    zapcore.ISO8601TimeEncoder,
+		EncodeLevel: func(level zapcore.Level, encoder zapcore.PrimitiveArrayEncoder) {
+			encoder.AppendString(firstUpper(level.String()))
+		},
+		EncodeCaller: func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
+			encoder.AppendString("[" + caller.TrimmedPath() + "]")
+		},
+		EncodeDuration:   zapcore.SecondsDurationEncoder,
+		EncodeName:       zapcore.FullNameEncoder,
+		ConsoleSeparator: " ",
+	}
 	encoder := zapcore.NewJSONEncoder(config)
-
+	// 将日志输出到屏幕
 	core := zapcore.NewCore(encoder, os.Stdout, levelController)
 	// 将日志输出到滚动切割文件中
 	if logfile != "" {
@@ -47,6 +62,13 @@ func SetupLogger(logfile string) {
 	_zLogger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2), zap.AddStacktrace(zapcore.FatalLevel)) // 选择输出调用点,对于FatalLevel输出调用堆栈；
 
 	rootLogger = newzLogger(_zLogger)
+}
+
+func firstUpper(s string) string {
+	if s == "" {
+		return ""
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
 }
 
 func SetLevel(l zapcore.Level) {
