@@ -91,11 +91,11 @@ func fileWriter(path string) io.Writer {
 		MaxBackups: 7,
 		MaxSize:    50,
 		MaxAge:     7,
-		Compress:   true, // disabled by default
-		LocalTime:  true, // use local time zone
+		Compress:   false, // disabled by default
+		LocalTime:  true,  // use local time zone
 	}
 	c := cron.New()
-	_, _ = c.AddFunc("@daily", func() {
+	_, _ = c.AddFunc("59 23 * * *", func() {
 		_ = out.Rotate()
 	})
 	c.Start()
