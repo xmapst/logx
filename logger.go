@@ -62,6 +62,7 @@ type Logger interface {
 	DPanicw(string, ...interface{})
 	DPanicx(string, ...zapcore.Field)
 
+	Enabled(level zapcore.Level) bool
 	GetSubLogger() Logger
 	GetSubLoggerWithFields(fields ...zap.Field) Logger
 	GetSubLoggerWithKeyValue(map[string]string) Logger
@@ -309,6 +310,10 @@ func (z *zLogger) Fatalx(msg string, fields ...zapcore.Field) {
 // Sync 将zapLogger缓冲内容刷写到输出端
 func (z *zLogger) Sync() error {
 	return z.logger.Sync()
+}
+
+func (z *zLogger) Enabled(level zapcore.Level) bool {
+	return z.logger.Core().Enabled(level)
 }
 
 // GetSubLogger 获取一个子Logger
