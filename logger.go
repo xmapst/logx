@@ -63,6 +63,7 @@ type Logger interface {
 	DPanicx(string, ...zapcore.Field)
 
 	GetSubLogger() Logger
+	GetSubLoggerWithFields(fields ...zap.Field) Logger
 	GetSubLoggerWithKeyValue(map[string]string) Logger
 	GetSubLoggerWithOption(...zap.Option) Logger
 }
@@ -313,6 +314,12 @@ func (z *zLogger) Sync() error {
 // GetSubLogger 获取一个子Logger
 func (z *zLogger) GetSubLogger() Logger {
 	_zLogger := z.logger.WithOptions()
+	tmp := newzLogger(_zLogger)
+	return tmp
+}
+
+func (z *zLogger) GetSubLoggerWithFields(fields ...zap.Field) Logger {
+	_zLogger := z.logger.With(fields...)
 	tmp := newzLogger(_zLogger)
 	return tmp
 }

@@ -329,6 +329,13 @@ func GetSubLogger() Logger {
 	return rootLogger.GetSubLogger()
 }
 
+func GetSubLoggerWithFields(fields ...zap.Field) Logger {
+	if rootLogger == nil {
+		initDefaultLogger()
+	}
+	return rootLogger.GetSubLoggerWithFields(fields...)
+}
+
 // GetSubLoggerWithKeyValue 使用指定的key/value,获取一个带有输出key/value内容的子logger
 func GetSubLoggerWithKeyValue(keysAndValues map[string]string) Logger {
 	if rootLogger == nil {
